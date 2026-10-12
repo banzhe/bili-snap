@@ -1,3 +1,4 @@
+import { DEFAULT_IMAGE_FORMAT, WEBP_QUALITY, imageFormatItem, type ImageFormat } from '@/lib/image-format'
 import type { SaveResult, ToBackground } from '@/lib/messages'
 import { DEFAULT_SHORTCUT, matchShortcut, shortcutItem, type Shortcut } from '@/lib/shortcut'
 
@@ -5,6 +6,7 @@ const OK_TOAST_MS = 1500
 const FAIL_TOAST_MS = 3000
 
 let shortcut: Shortcut = DEFAULT_SHORTCUT
+let imageFormat: ImageFormat = DEFAULT_IMAGE_FORMAT
 
 export default defineContentScript({
   // bilibili 是 SPA，站内跳转不会重新注入，所以匹配整个站点、按键时再找 <video>。
@@ -12,6 +14,8 @@ export default defineContentScript({
   main() {
     void shortcutItem.getValue().then((value) => (shortcut = value))
     shortcutItem.watch((value) => (shortcut = value))
+    void imageFormatItem.getValue().then((value) => (imageFormat = value))
+    imageFormatItem.watch((value) => (imageFormat = value))
     window.addEventListener('keydown', onKeydown, true)
   },
 })
@@ -62,8 +66,9 @@ async function snap(video: HTMLVideoElement): Promise<void> {
       return
     }
 
-    const fileName = buildFileName(video)
-    const dataUrl = captureFrame(video)
+    const format = imageFormat
+    const fileName = buildFileName(video, format)
+    const dataUrl = captureFrame(video, format)
     const message: ToBackground = { target: 'background', type: 'save-frame', dataUrl, fileName }
     const result = (await browser.runtime.sendMessage(message)) as SaveResult | undefined
 
@@ -80,17 +85,17 @@ async function snap(video: HTMLVideoElement): Promise<void> {
 }
 
 /** drawImage 只画 <video> 本身的解码帧，天然不含弹幕、字幕和播放器 UI。 */
-function captureFrame(video: HTMLVideoElement): string {
+function captureFrame(video: HTMLVideoElement, format: ImageFormat): string {
   const canvas = document.createElement('canvas')
   canvas.width = video.videoWidth
   canvas.height = video.videoHeight
   const ctx = canvas.getContext('2d')
   if (!ctx) throw new Error('canvas 2d context unavailable')
   ctx.drawImage(video, 0, 0)
-  return canvas.toDataURL('image/png')
+  return canvas.toDataURL(`image/${format}`, WEBP_QUALITY)
 }
 
-function buildFileName(video: HTMLVideoElement): string {
+function buildFileName(video: HTMLVideoElement, format: ImageFormat): string {
   const title = document.title
     .replace(/_哔哩哔哩_bilibili$/, '')
     .replace(/-哔哩哔哩$/, '')
@@ -98,7 +103,7 @@ function buildFileName(video: HTMLVideoElement): string {
   const id = location.pathname.match(/(BV\w+|ep\d+|ss\d+)/)?.[1] ?? ''
   const page = new URLSearchParams(location.search).get('p')
   const parts = [title || 'bilibili', id, page ? `p${page}` : '', formatTime(video.currentTime)]
-  return `${sanitize(parts.filter(Boolean).join('_'))}.png`
+  return `${sanitize(parts.filter(Boolean).join('_'))}.${format}`
 }
 
 function formatTime(seconds: number): string {

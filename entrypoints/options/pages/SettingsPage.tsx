@@ -9,6 +9,7 @@ import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card'
 import { loadDirHandle, saveDirHandle } from '@/lib/dir-store'
 import { pickDirectory, queryDirPermission, requestDirPermission, type DirHandleLike } from '@/lib/fsa'
+import FormatCard from '../components/FormatCard'
 import ShortcutCard from '../components/ShortcutCard'
 
 type Permission = PermissionState | 'none'
@@ -81,7 +82,7 @@ export default function SettingsPage() {
       <div>
         <h2 class="text-2xl font-semibold tracking-tight">配置</h2>
         <p class="mt-1 text-sm text-muted-foreground">
-          在 bilibili 视频页按快捷键截取当前视频帧（不含弹幕、字幕和播放器 UI），PNG 会直接写入下面的保存目录。
+          在 bilibili 视频页按快捷键截取当前视频帧（不含弹幕、字幕和播放器 UI），图片会直接写入下面的保存目录。
         </p>
       </div>
 
@@ -154,6 +155,8 @@ export default function SettingsPage() {
           </ol>
         </CardContent>
       </Card>
+
+      <FormatCard />
 
       <ShortcutCard />
     </div>
