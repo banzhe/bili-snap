@@ -1,6 +1,6 @@
 {
   "name": "bili-snap",
-  "version": "0.0.0",
+  "version": "0.0.1",
   "private": true,
   "description": "在 bilibili 视频页按快捷键截取不含弹幕的视频帧，保存到指定目录。",
   "type": "module",
