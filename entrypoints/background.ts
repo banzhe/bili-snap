@@ -10,6 +10,8 @@ import {
 } from '@/lib/messages'
 
 export default defineBackground(() => {
+  browser.action.onClicked.addListener(() => void browser.runtime.openOptionsPage())
+
   browser.runtime.onMessage.addListener((message: unknown, _sender, sendResponse) => {
     const msg = message as ToBackground | undefined
     if (msg?.target !== 'background') return false
