@@ -8,13 +8,13 @@ const SAVE_DIR_KEY = 'saveDir';
 function openDb(): Promise<IDBDatabase> {
   return new Promise((resolve, reject) => {
     const request = indexedDB.open(DB_NAME, DB_VERSION);
-    request.onupgradeneeded = () => {
+    request.addEventListener('upgradeneeded', () => {
       if (!request.result.objectStoreNames.contains(STORE_NAME)) {
         request.result.createObjectStore(STORE_NAME);
       }
-    };
-    request.onsuccess = () => resolve(request.result);
-    request.onerror = () => reject(request.error);
+    });
+    request.addEventListener('success', () => resolve(request.result));
+    request.addEventListener('error', () => reject(request.error));
   });
 }
 
@@ -27,9 +27,9 @@ async function withStore<T>(
     return await new Promise<T>((resolve, reject) => {
       const tx = db.transaction(STORE_NAME, mode);
       const request = run(tx.objectStore(STORE_NAME));
-      request.onsuccess = () => resolve(request.result);
-      request.onerror = () => reject(request.error);
-      tx.onabort = () => reject(tx.error);
+      request.addEventListener('success', () => resolve(request.result));
+      request.addEventListener('error', () => reject(request.error));
+      tx.addEventListener('abort', () => reject(tx.error));
     });
   } finally {
     db.close();

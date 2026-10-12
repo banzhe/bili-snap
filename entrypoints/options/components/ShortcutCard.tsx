@@ -51,21 +51,21 @@ export default function ShortcutCard() {
   }
 
   // 录制期间在捕获阶段吞掉所有按键，避免触发按钮或页面上的其它快捷键。
+  function onKeydown(event: KeyboardEvent) {
+    event.preventDefault();
+    event.stopPropagation();
+    if (event.key === 'Escape' && !event.ctrlKey && !event.altKey && !event.shiftKey && !event.metaKey) {
+      setRecording(false);
+      return;
+    }
+    const next = shortcutFromEvent(event);
+    if (!next) return;
+    setRecording(false);
+    void save(next);
+  }
+
   createEffect(() => {
     if (!recording()) return;
-
-    const onKeydown = (event: KeyboardEvent) => {
-      event.preventDefault();
-      event.stopPropagation();
-      if (event.key === 'Escape' && !event.ctrlKey && !event.altKey && !event.shiftKey && !event.metaKey) {
-        setRecording(false);
-        return;
-      }
-      const next = shortcutFromEvent(event);
-      if (!next) return;
-      setRecording(false);
-      void save(next);
-    };
 
     window.addEventListener('keydown', onKeydown, true);
     window.addEventListener('blur', stopRecording);

@@ -103,17 +103,23 @@ function formatTime(seconds: number): string {
   const s = Math.floor(total / 1000) % 60;
   const m = Math.floor(total / 60_000) % 60;
   const h = Math.floor(total / 3_600_000);
-  const pad = (value: number, width = 2) => String(value).padStart(width, '0');
   return `${h > 0 ? `${pad(h)}-` : ''}${pad(m)}-${pad(s)}.${pad(ms, 3)}`;
+}
+
+function pad(value: number, width = 2): string {
+  return String(value).padStart(width, '0');
 }
 
 /** Windows 文件名不允许 <>:"/\|?* 和控制字符，也不能以点或空格结尾。 */
 function sanitize(name: string): string {
-  return name
-    .replace(/[<>:"/\\|?*\u0000-\u001f]/g, '_')
-    .replace(/\s+/g, ' ')
-    .slice(0, 150)
-    .replace(/[. ]+$/, '');
+  return (
+    name
+      // oxlint-disable-next-line no-control-regex -- 控制字符正是要替换掉的
+      .replace(/[<>:"/\\|?*\u0000-\u001f]/g, '_')
+      .replace(/\s+/g, ' ')
+      .slice(0, 150)
+      .replace(/[. ]+$/, '')
+  );
 }
 
 function openOptions(): void {
