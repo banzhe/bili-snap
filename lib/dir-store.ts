@@ -46,7 +46,3 @@ export async function loadDirHandle(): Promise<DirHandleLike | null> {
   );
   return handle ?? null;
 }
-
-export async function clearDirHandle(): Promise<void> {
-  await withStore('readwrite', (store) => store.delete(SAVE_DIR_KEY));
-}

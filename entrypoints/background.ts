@@ -20,11 +20,6 @@ export default defineBackground(() => {
       } else if (msg.type === 'open-options') {
         await browser.runtime.openOptionsPage();
         sendResponse({ ok: true });
-      } else if (msg.type === 'offscreen-status') {
-        sendResponse({ alive: await offscreenExists() });
-      } else if (msg.type === 'offscreen-close') {
-        if (await offscreenExists()) await browser.offscreen.closeDocument();
-        sendResponse({ ok: true, alive: await offscreenExists() });
       }
     })();
 

@@ -2,14 +2,17 @@ import { Show, createSignal, onMount } from 'solid-js';
 import { loadDirHandle } from '@/lib/dir-store';
 import { queryDirPermission } from '@/lib/fsa';
 import { LOG_KEY, type LogEntry } from '@/lib/messages';
+import { DEFAULT_SHORTCUT, formatShortcut, shortcutItem } from '@/lib/shortcut';
 import './App.css';
 
 export default function App() {
   const [dirName, setDirName] = createSignal('');
   const [granted, setGranted] = createSignal(false);
   const [last, setLast] = createSignal<LogEntry | null>(null);
+  const [shortcut, setShortcut] = createSignal(DEFAULT_SHORTCUT);
 
   onMount(async () => {
+    setShortcut(await shortcutItem.getValue());
     const handle = await loadDirHandle();
     setDirName(handle?.name ?? '');
     setGranted(handle ? (await queryDirPermission(handle)) === 'granted' : false);
@@ -20,7 +23,7 @@ export default function App() {
   return (
     <div class="panel">
       <h1>bili-snap</h1>
-      <p>在视频页按 z 截图</p>
+      <p>在视频页按 {formatShortcut(shortcut())} 截图</p>
       <p class={dirName() && granted() ? 'ok' : 'fail'}>
         {dirName() ? `保存目录：${dirName()}${granted() ? '' : '（未授权）'}` : '还没有选择保存目录'}
       </p>

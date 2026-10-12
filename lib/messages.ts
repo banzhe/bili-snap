@@ -25,8 +25,6 @@ export interface FramePayload {
 
 export type ToBackground =
   | ({ target: 'background'; type: 'save-frame' } & FramePayload)
-  | { target: 'background'; type: 'open-options' }
-  | { target: 'background'; type: 'offscreen-status' }
-  | { target: 'background'; type: 'offscreen-close' };
+  | { target: 'background'; type: 'open-options' };
 
 export type ToOffscreen = { target: 'offscreen'; type: 'save-frame' } & FramePayload;

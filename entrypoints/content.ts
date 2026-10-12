@@ -1,20 +1,23 @@
 import type { SaveResult, ToBackground } from '@/lib/messages';
+import { DEFAULT_SHORTCUT, matchShortcut, shortcutItem, type Shortcut } from '@/lib/shortcut';
 
-const SHORTCUT_KEY = 'z';
 const TOAST_MS = 2500;
+
+let shortcut: Shortcut = DEFAULT_SHORTCUT;
 
 export default defineContentScript({
   // bilibili 是 SPA，站内跳转不会重新注入，所以匹配整个站点、按键时再找 <video>。
   matches: ['*://www.bilibili.com/*'],
   main() {
+    void shortcutItem.getValue().then((value) => (shortcut = value));
+    shortcutItem.watch((value) => (shortcut = value));
     window.addEventListener('keydown', onKeydown, true);
   },
 });
 
 function onKeydown(event: KeyboardEvent): void {
-  if (event.key.toLowerCase() !== SHORTCUT_KEY) return;
+  if (!matchShortcut(event, shortcut)) return;
   if (event.repeat || event.isComposing) return;
-  if (event.ctrlKey || event.altKey || event.metaKey || event.shiftKey) return;
   if (isTyping(event)) return;
 
   const video = findVideo();
