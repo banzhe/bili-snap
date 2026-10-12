@@ -7,14 +7,11 @@ let queue: Promise<unknown> = Promise.resolve();
 
 browser.runtime.onMessage.addListener((message: unknown, _sender, sendResponse) => {
   const msg = message as ToOffscreen | undefined;
-  if (msg?.target !== 'offscreen') return false;
+  if (msg?.target !== 'offscreen' || msg.type !== 'save-frame') return false;
 
-  if (msg.type === 'save-frame') {
-    const task = queue.then(() => saveFrame(msg.dataUrl, msg.fileName));
-    queue = task;
-    void task.then(sendResponse);
-  }
-
+  const task = queue.then(() => saveFrame(msg.dataUrl, msg.fileName));
+  queue = task;
+  void task.then(sendResponse);
   return true;
 });
 

@@ -66,7 +66,12 @@ async function saveFrame(frame: FramePayload): Promise<SaveResult> {
   let result: SaveResult;
   try {
     await ensureOffscreen();
-    const message: ToOffscreen = { target: 'offscreen', type: 'save-frame', ...frame };
+    const message: ToOffscreen = {
+      target: 'offscreen',
+      type: 'save-frame',
+      dataUrl: frame.dataUrl,
+      fileName: frame.fileName,
+    };
     const response = (await browser.runtime.sendMessage(message)) as SaveResult | undefined;
     result = response ?? { ok: false, error: 'offscreen document did not respond' };
   } catch (error) {
