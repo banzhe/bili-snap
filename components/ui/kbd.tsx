@@ -1,8 +1,8 @@
-import { splitProps, type ComponentProps } from 'solid-js';
-import { cn } from '@/lib/utils';
+import { splitProps, type ComponentProps } from 'solid-js'
+import { cn } from '@/lib/utils'
 
 export function Kbd(props: ComponentProps<'kbd'>) {
-  const [local, others] = splitProps(props, ['class']);
+  const [local, others] = splitProps(props, ['class'])
   return (
     <kbd
       class={cn(
@@ -11,10 +11,10 @@ export function Kbd(props: ComponentProps<'kbd'>) {
       )}
       {...others}
     />
-  );
+  )
 }
 
 export function KbdGroup(props: ComponentProps<'span'>) {
-  const [local, others] = splitProps(props, ['class']);
-  return <span class={cn('inline-flex items-center gap-1', local.class)} {...others} />;
+  const [local, others] = splitProps(props, ['class'])
+  return <span class={cn('inline-flex items-center gap-1', local.class)} {...others} />
 }

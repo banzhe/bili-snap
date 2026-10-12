@@ -1,80 +1,80 @@
-import CircleAlert from 'lucide-solid/icons/circle-alert';
-import FolderOpen from 'lucide-solid/icons/folder-open';
-import Info from 'lucide-solid/icons/info';
-import ShieldCheck from 'lucide-solid/icons/shield-check';
-import { Show, createSignal, onCleanup, onMount } from 'solid-js';
-import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
-import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
-import { loadDirHandle, saveDirHandle } from '@/lib/dir-store';
-import { pickDirectory, queryDirPermission, requestDirPermission, type DirHandleLike } from '@/lib/fsa';
-import ShortcutCard from '../components/ShortcutCard';
+import CircleAlert from 'lucide-solid/icons/circle-alert'
+import FolderOpen from 'lucide-solid/icons/folder-open'
+import Info from 'lucide-solid/icons/info'
+import ShieldCheck from 'lucide-solid/icons/shield-check'
+import { Show, createSignal, onCleanup, onMount } from 'solid-js'
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
+import { Badge } from '@/components/ui/badge'
+import { Button } from '@/components/ui/button'
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card'
+import { loadDirHandle, saveDirHandle } from '@/lib/dir-store'
+import { pickDirectory, queryDirPermission, requestDirPermission, type DirHandleLike } from '@/lib/fsa'
+import ShortcutCard from '../components/ShortcutCard'
 
-type Permission = PermissionState | 'none';
+type Permission = PermissionState | 'none'
 
 const PERMISSION_LABEL: Record<Permission, string> = {
   granted: '已授权',
   prompt: '待授权',
   denied: '已拒绝',
   none: '未选择目录',
-};
+}
 
 const PERMISSION_VARIANT = {
   granted: 'success',
   prompt: 'warning',
   denied: 'destructive',
   none: 'secondary',
-} as const;
+} as const
 
 export default function SettingsPage() {
-  const [dir, setDir] = createSignal<DirHandleLike | null>(null);
-  const [permission, setPermission] = createSignal<Permission>('none');
-  const [status, setStatus] = createSignal<{ ok: boolean; text: string } | null>(null);
-  const [busy, setBusy] = createSignal(false);
+  const [dir, setDir] = createSignal<DirHandleLike | null>(null)
+  const [permission, setPermission] = createSignal<Permission>('none')
+  const [status, setStatus] = createSignal<{ ok: boolean; text: string } | null>(null)
+  const [busy, setBusy] = createSignal(false)
 
   async function refresh() {
-    const handle = await loadDirHandle();
-    setDir(handle);
-    setPermission(handle ? await queryDirPermission(handle) : 'none');
+    const handle = await loadDirHandle()
+    setDir(handle)
+    setPermission(handle ? await queryDirPermission(handle) : 'none')
   }
 
   onMount(() => {
-    void refresh();
-    const onFocus = () => void refresh();
-    window.addEventListener('focus', onFocus);
-    onCleanup(() => window.removeEventListener('focus', onFocus));
-  });
+    void refresh()
+    const onFocus = () => void refresh()
+    window.addEventListener('focus', onFocus)
+    onCleanup(() => window.removeEventListener('focus', onFocus))
+  })
 
   async function run(label: string, task: () => Promise<string>) {
-    setBusy(true);
+    setBusy(true)
     try {
-      setStatus({ ok: true, text: `${label}：${await task()}` });
+      setStatus({ ok: true, text: `${label}：${await task()}` })
     } catch (error) {
-      setStatus({ ok: false, text: `${label}失败：${String(error)}` });
+      setStatus({ ok: false, text: `${label}失败：${String(error)}` })
     } finally {
-      setBusy(false);
-      await refresh();
+      setBusy(false)
+      await refresh()
     }
   }
 
   const chooseDir = () =>
     run('选择保存目录', async () => {
-      const handle = await pickDirectory();
-      let state = await queryDirPermission(handle);
-      if (state !== 'granted') state = await requestDirPermission(handle);
-      await saveDirHandle(handle);
-      return `${handle.name}（${PERMISSION_LABEL[state]}）`;
-    });
+      const handle = await pickDirectory()
+      let state = await queryDirPermission(handle)
+      if (state !== 'granted') state = await requestDirPermission(handle)
+      await saveDirHandle(handle)
+      return `${handle.name}（${PERMISSION_LABEL[state]}）`
+    })
 
   // requestDirPermission 之前不能有任何 await，否则用户手势会失效。
   const authorize = () =>
     run('授权保存目录', async () => {
-      const handle = dir();
-      if (!handle) return '还没有保存目录，请先选择';
-      const state = await requestDirPermission(handle);
-      return state === 'granted' ? '已授权；如果弹出三选一，请选 Allow on every visit' : `未授权（${state}）`;
-    });
+      const handle = dir()
+      if (!handle) return '还没有保存目录，请先选择'
+      const state = await requestDirPermission(handle)
+      return state === 'granted' ? '已授权；如果弹出三选一，请选 Allow on every visit' : `未授权（${state}）`
+    })
 
   return (
     <div class="flex flex-col gap-6">
@@ -157,5 +157,5 @@ export default function SettingsPage() {
 
       <ShortcutCard />
     </div>
-  );
+  )
 }

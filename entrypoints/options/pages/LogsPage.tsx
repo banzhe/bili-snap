@@ -1,25 +1,25 @@
-import { For, Show, createSignal, onCleanup, onMount } from 'solid-js';
-import { Badge } from '@/components/ui/badge';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { LOG_KEY, LOG_LIMIT, type LogEntry } from '@/lib/messages';
+import { For, Show, createSignal, onCleanup, onMount } from 'solid-js'
+import { Badge } from '@/components/ui/badge'
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
+import { LOG_KEY, LOG_LIMIT, type LogEntry } from '@/lib/messages'
 
 export default function LogsPage() {
-  const [logs, setLogs] = createSignal<LogEntry[]>([]);
+  const [logs, setLogs] = createSignal<LogEntry[]>([])
 
   async function refresh() {
-    const stored = await browser.storage.local.get(LOG_KEY);
-    setLogs((stored[LOG_KEY] as LogEntry[] | undefined) ?? []);
+    const stored = await browser.storage.local.get(LOG_KEY)
+    setLogs((stored[LOG_KEY] as LogEntry[] | undefined) ?? [])
   }
 
   onMount(() => {
-    void refresh();
+    void refresh()
     const onChanged = (changes: Record<string, unknown>) => {
-      if (LOG_KEY in changes) void refresh();
-    };
-    browser.storage.local.onChanged.addListener(onChanged);
-    onCleanup(() => browser.storage.local.onChanged.removeListener(onChanged));
-  });
+      if (LOG_KEY in changes) void refresh()
+    }
+    browser.storage.local.onChanged.addListener(onChanged)
+    onCleanup(() => browser.storage.local.onChanged.removeListener(onChanged))
+  })
 
   return (
     <div class="flex flex-col gap-6">
@@ -36,7 +36,10 @@ export default function LogsPage() {
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <Show when={logs().length > 0} fallback={<p class="py-8 text-center text-sm text-muted-foreground">还没有记录。</p>}>
+          <Show
+            when={logs().length > 0}
+            fallback={<p class="py-8 text-center text-sm text-muted-foreground">还没有记录。</p>}
+          >
             <Table>
               <TableHeader>
                 <TableRow>
@@ -59,7 +62,9 @@ export default function LogsPage() {
                       <TableCell class="text-right whitespace-nowrap tabular-nums">
                         {entry.bytes ? `${Math.round(entry.bytes / 1024)} KB` : '-'}
                       </TableCell>
-                      <TableCell class={entry.ok ? 'font-mono text-xs break-all' : 'text-xs break-all text-destructive'}>
+                      <TableCell
+                        class={entry.ok ? 'font-mono text-xs break-all' : 'text-xs break-all text-destructive'}
+                      >
                         {entry.file ?? entry.error ?? '-'}
                       </TableCell>
                     </TableRow>
@@ -71,5 +76,5 @@ export default function LogsPage() {
         </CardContent>
       </Card>
     </div>
-  );
+  )
 }

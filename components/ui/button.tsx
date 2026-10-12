@@ -1,8 +1,8 @@
-import * as ButtonPrimitive from '@kobalte/core/button';
-import type { PolymorphicProps } from '@kobalte/core/polymorphic';
-import { cva, type VariantProps } from 'class-variance-authority';
-import { splitProps, type JSX, type ValidComponent } from 'solid-js';
-import { cn } from '@/lib/utils';
+import * as ButtonPrimitive from '@kobalte/core/button'
+import type { PolymorphicProps } from '@kobalte/core/polymorphic'
+import { cva, type VariantProps } from 'class-variance-authority'
+import { splitProps, type JSX, type ValidComponent } from 'solid-js'
+import { cn } from '@/lib/utils'
 
 export const buttonVariants = cva(
   "inline-flex shrink-0 cursor-pointer items-center justify-center gap-2 rounded-md text-sm font-medium whitespace-nowrap transition-colors outline-none focus-visible:ring-[3px] focus-visible:ring-ring/50 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4",
@@ -28,20 +28,20 @@ export const buttonVariants = cva(
       size: 'default',
     },
   },
-);
+)
 
 type ButtonProps<T extends ValidComponent = 'button'> = ButtonPrimitive.ButtonRootProps<T> &
   VariantProps<typeof buttonVariants> & {
-    class?: string | undefined;
-    children?: JSX.Element;
-  };
+    class?: string | undefined
+    children?: JSX.Element
+  }
 
 export function Button<T extends ValidComponent = 'button'>(props: PolymorphicProps<T, ButtonProps<T>>) {
-  const [local, others] = splitProps(props as ButtonProps, ['variant', 'size', 'class']);
+  const [local, others] = splitProps(props as ButtonProps, ['variant', 'size', 'class'])
   return (
     <ButtonPrimitive.Root
       class={cn(buttonVariants({ variant: local.variant, size: local.size }), local.class)}
       {...others}
     />
-  );
+  )
 }

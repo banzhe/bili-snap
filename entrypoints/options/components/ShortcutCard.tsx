@@ -1,11 +1,11 @@
-import CircleAlert from 'lucide-solid/icons/circle-alert';
-import Keyboard from 'lucide-solid/icons/keyboard';
-import RotateCcw from 'lucide-solid/icons/rotate-ccw';
-import { For, Show, createEffect, createSignal, onCleanup, onMount } from 'solid-js';
-import { Alert, AlertDescription } from '@/components/ui/alert';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
-import { Kbd, KbdGroup } from '@/components/ui/kbd';
+import CircleAlert from 'lucide-solid/icons/circle-alert'
+import Keyboard from 'lucide-solid/icons/keyboard'
+import RotateCcw from 'lucide-solid/icons/rotate-ccw'
+import { For, Show, createEffect, createSignal, onCleanup, onMount } from 'solid-js'
+import { Alert, AlertDescription } from '@/components/ui/alert'
+import { Button } from '@/components/ui/button'
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card'
+import { Kbd, KbdGroup } from '@/components/ui/kbd'
 import {
   DEFAULT_SHORTCUT,
   conflictsWithBilibili,
@@ -15,7 +15,7 @@ import {
   shortcutItem,
   shortcutParts,
   type Shortcut,
-} from '@/lib/shortcut';
+} from '@/lib/shortcut'
 
 export function ShortcutKeys(props: { shortcut: Shortcut }) {
   return (
@@ -31,58 +31,58 @@ export function ShortcutKeys(props: { shortcut: Shortcut }) {
         )}
       </For>
     </KbdGroup>
-  );
+  )
 }
 
 export default function ShortcutCard() {
-  const [shortcut, setShortcut] = createSignal<Shortcut>(DEFAULT_SHORTCUT);
-  const [recording, setRecording] = createSignal(false);
-  const [message, setMessage] = createSignal('');
+  const [shortcut, setShortcut] = createSignal<Shortcut>(DEFAULT_SHORTCUT)
+  const [recording, setRecording] = createSignal(false)
+  const [message, setMessage] = createSignal('')
 
   onMount(() => {
-    void shortcutItem.getValue().then(setShortcut);
-    onCleanup(shortcutItem.watch(setShortcut));
-  });
+    void shortcutItem.getValue().then(setShortcut)
+    onCleanup(shortcutItem.watch(setShortcut))
+  })
 
   async function save(next: Shortcut) {
-    await shortcutItem.setValue(next);
-    setShortcut(next);
-    setMessage(`快捷键已改为 ${formatShortcut(next)}，已打开的视频页无需刷新即可生效。`);
+    await shortcutItem.setValue(next)
+    setShortcut(next)
+    setMessage(`快捷键已改为 ${formatShortcut(next)}，已打开的视频页无需刷新即可生效。`)
   }
 
   // 录制期间在捕获阶段吞掉所有按键，避免触发按钮或页面上的其它快捷键。
   function onKeydown(event: KeyboardEvent) {
-    event.preventDefault();
-    event.stopPropagation();
+    event.preventDefault()
+    event.stopPropagation()
     if (event.key === 'Escape' && !event.ctrlKey && !event.altKey && !event.shiftKey && !event.metaKey) {
-      setRecording(false);
-      return;
+      setRecording(false)
+      return
     }
-    const next = shortcutFromEvent(event);
-    if (!next) return;
-    setRecording(false);
-    void save(next);
+    const next = shortcutFromEvent(event)
+    if (!next) return
+    setRecording(false)
+    void save(next)
   }
 
   createEffect(() => {
-    if (!recording()) return;
+    if (!recording()) return
 
-    window.addEventListener('keydown', onKeydown, true);
-    window.addEventListener('blur', stopRecording);
+    window.addEventListener('keydown', onKeydown, true)
+    window.addEventListener('blur', stopRecording)
     onCleanup(() => {
-      window.removeEventListener('keydown', onKeydown, true);
-      window.removeEventListener('blur', stopRecording);
-    });
-  });
+      window.removeEventListener('keydown', onKeydown, true)
+      window.removeEventListener('blur', stopRecording)
+    })
+  })
 
   function startRecording() {
-    (document.activeElement as HTMLElement | null)?.blur();
-    setMessage('');
-    setRecording(true);
+    ;(document.activeElement as HTMLElement | null)?.blur()
+    setMessage('')
+    setRecording(true)
   }
 
   function stopRecording() {
-    setRecording(false);
+    setRecording(false)
   }
 
   return (
@@ -104,7 +104,9 @@ export default function ShortcutCard() {
         <Show when={!recording() && conflictsWithBilibili(shortcut())}>
           <Alert variant="warning">
             <CircleAlert />
-            <AlertDescription>这个键也是 bilibili 播放器的快捷键，按下时会同时触发播放器的动作，建议换一个或加上修饰键。</AlertDescription>
+            <AlertDescription>
+              这个键也是 bilibili 播放器的快捷键，按下时会同时触发播放器的动作，建议换一个或加上修饰键。
+            </AlertDescription>
           </Alert>
         </Show>
 
@@ -136,5 +138,5 @@ export default function ShortcutCard() {
         </Button>
       </CardFooter>
     </Card>
-  );
+  )
 }

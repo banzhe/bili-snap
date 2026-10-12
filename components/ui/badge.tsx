@@ -1,6 +1,6 @@
-import { cva, type VariantProps } from 'class-variance-authority';
-import { splitProps, type ComponentProps } from 'solid-js';
-import { cn } from '@/lib/utils';
+import { cva, type VariantProps } from 'class-variance-authority'
+import { splitProps, type ComponentProps } from 'solid-js'
+import { cn } from '@/lib/utils'
 
 export const badgeVariants = cva(
   'inline-flex w-fit shrink-0 items-center justify-center gap-1 rounded-md border px-2 py-0.5 text-xs font-medium whitespace-nowrap [&>svg]:pointer-events-none [&>svg]:size-3',
@@ -19,11 +19,11 @@ export const badgeVariants = cva(
       variant: 'default',
     },
   },
-);
+)
 
-type BadgeProps = ComponentProps<'span'> & VariantProps<typeof badgeVariants>;
+type BadgeProps = ComponentProps<'span'> & VariantProps<typeof badgeVariants>
 
 export function Badge(props: BadgeProps) {
-  const [local, others] = splitProps(props, ['class', 'variant']);
-  return <span class={cn(badgeVariants({ variant: local.variant }), local.class)} {...others} />;
+  const [local, others] = splitProps(props, ['class', 'variant'])
+  return <span class={cn(badgeVariants({ variant: local.variant }), local.class)} {...others} />
 }

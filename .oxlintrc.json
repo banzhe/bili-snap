@@ -1,11 +1,6 @@
 {
   "$schema": "./node_modules/oxlint/configuration_schema.json",
-  "plugins": [
-    "typescript",
-    "unicorn",
-    "oxc",
-    "import"
-  ],
+  "plugins": ["typescript", "unicorn", "oxc", "import"],
   "categories": {
     "correctness": "error",
     "suspicious": "warn"
@@ -14,18 +9,12 @@
     "browser": true,
     "es2024": true
   },
-  "ignorePatterns": [
-    ".output/**",
-    ".wxt/**",
-    "node_modules/**"
-  ],
+  "ignorePatterns": [".output/**", ".wxt/**", "node_modules/**"],
   "rules": {
     "import/no-unassigned-import": [
       "warn",
       {
-        "allow": [
-          "**/*.css"
-        ]
+        "allow": ["**/*.css"]
       }
     ]
   }

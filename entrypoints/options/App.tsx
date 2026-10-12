@@ -1,9 +1,9 @@
-import { A, HashRouter, Route, type RouteSectionProps } from '@solidjs/router';
-import ScrollText from 'lucide-solid/icons/scroll-text';
-import Settings from 'lucide-solid/icons/settings';
-import type { Component, JSX } from 'solid-js';
-import LogsPage from './pages/LogsPage';
-import SettingsPage from './pages/SettingsPage';
+import { A, HashRouter, Route, type RouteSectionProps } from '@solidjs/router'
+import ScrollText from 'lucide-solid/icons/scroll-text'
+import Settings from 'lucide-solid/icons/settings'
+import type { Component, JSX } from 'solid-js'
+import LogsPage from './pages/LogsPage'
+import SettingsPage from './pages/SettingsPage'
 
 function NavLink(props: { href: string; end?: boolean; icon: Component<{ class?: string }>; children: JSX.Element }) {
   return (
@@ -16,7 +16,7 @@ function NavLink(props: { href: string; end?: boolean; icon: Component<{ class?:
       <props.icon class="size-4" />
       {props.children}
     </A>
-  );
+  )
 }
 
 function Layout(props: RouteSectionProps) {
@@ -38,7 +38,7 @@ function Layout(props: RouteSectionProps) {
       </aside>
       <main class="min-w-0 flex-1">{props.children}</main>
     </div>
-  );
+  )
 }
 
 export default function App() {
@@ -47,5 +47,5 @@ export default function App() {
       <Route path="/" component={SettingsPage} />
       <Route path="/logs" component={LogsPage} />
     </HashRouter>
-  );
+  )
 }
