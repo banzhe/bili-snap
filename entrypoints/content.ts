@@ -1,7 +1,8 @@
 import type { SaveResult, ToBackground } from '@/lib/messages'
 import { DEFAULT_SHORTCUT, matchShortcut, shortcutItem, type Shortcut } from '@/lib/shortcut'
 
-const TOAST_MS = 2500
+const OK_TOAST_MS = 1500
+const FAIL_TOAST_MS = 3000
 
 let shortcut: Shortcut = DEFAULT_SHORTCUT
 
@@ -67,7 +68,7 @@ async function snap(video: HTMLVideoElement): Promise<void> {
     const result = (await browser.runtime.sendMessage(message)) as SaveResult | undefined
 
     if (result?.ok) {
-      showToast(`已保存 ${result.file ?? fileName}`, 'ok')
+      showToast(`✓ 已保存 ${result.file ?? fileName}`, 'ok')
     } else if (result?.needsAuth) {
       showToast(`${result.error ?? '保存目录未授权'}，点此打开设置`, 'fail', openOptions)
     } else {
@@ -133,26 +134,33 @@ function openOptions(): void {
 let toast: HTMLDivElement | null = null
 let toastTimer: ReturnType<typeof setTimeout> | undefined
 
+/** 成功提示是右上角的小号半透明单行，失败提示同位置但更醒目、可换行。 */
 function showToast(text: string, kind: 'ok' | 'fail', onClick?: () => void): void {
   toast?.remove()
   clearTimeout(toastTimer)
 
+  const ok = kind === 'ok'
   const el = document.createElement('div')
   el.textContent = text
+  el.title = text
   Object.assign(el.style, {
     position: 'fixed',
-    top: '16px',
-    left: '50%',
-    transform: 'translateX(-50%)',
+    top: '12px',
+    right: '12px',
     zIndex: '2147483647',
-    maxWidth: '80vw',
-    padding: '8px 14px',
+    maxWidth: ok ? '320px' : '420px',
+    padding: ok ? '4px 10px' : '8px 14px',
     borderRadius: '6px',
-    font: '13px/1.5 system-ui, "Microsoft YaHei", sans-serif',
+    font: `${ok ? 12 : 13}px/1.5 system-ui, "Microsoft YaHei", sans-serif`,
     color: '#fff',
-    background: kind === 'ok' ? 'rgba(20, 140, 90, 0.92)' : 'rgba(200, 50, 50, 0.92)',
-    boxShadow: '0 2px 8px rgba(0, 0, 0, 0.3)',
-    wordBreak: 'break-all',
+    background: ok ? 'rgba(0, 0, 0, 0.55)' : 'rgba(200, 50, 50, 0.92)',
+    boxShadow: ok ? 'none' : '0 2px 8px rgba(0, 0, 0, 0.3)',
+    whiteSpace: ok ? 'nowrap' : 'normal',
+    overflow: 'hidden',
+    textOverflow: 'ellipsis',
+    wordBreak: ok ? 'normal' : 'break-all',
+    opacity: '0',
+    transition: 'opacity 150ms ease',
     cursor: onClick ? 'pointer' : 'default',
     pointerEvents: onClick ? 'auto' : 'none',
   } satisfies Partial<CSSStyleDeclaration>)
@@ -161,5 +169,14 @@ function showToast(text: string, kind: 'ok' | 'fail', onClick?: () => void): voi
   // 全屏时挂在普通位置会被遮住，必须挂进全屏元素内部。
   ;(document.fullscreenElement ?? document.body).append(el)
   toast = el
-  toastTimer = setTimeout(() => el.remove(), onClick ? TOAST_MS * 2 : TOAST_MS)
+  // 先强制一次布局，opacity 从 0 到 1 才会有过渡。
+  void el.offsetWidth
+  el.style.opacity = '1'
+
+  const duration = ok ? OK_TOAST_MS : onClick ? FAIL_TOAST_MS * 2 : FAIL_TOAST_MS
+  toastTimer = setTimeout(() => {
+    el.style.opacity = '0'
+    // 后台标签页里 transitionend 可能不触发，所以用定时器兜底移除。
+    setTimeout(() => el.remove(), 200)
+  }, duration)
 }
